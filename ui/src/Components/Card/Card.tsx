@@ -2,92 +2,94 @@
 
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Switch from "@mui/material/Switch";
-import Paper from "@mui/material/Paper";
 import Slide from "@mui/material/Slide";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import { Button, Container, Grid, Typography } from "@mui/material";
 
-const icon = (
-  <Paper sx={{ m: 1, width: 800, height: 200, p: 4 }} elevation={4}>
-    {/* <svg> */}
-    <Box
-      component="polygon"
-      // points="0,100 50,00, 100,100"
-      sx={{
-        fill: (theme) => theme.palette.common.white,
-        stroke: (theme) => theme.palette.divider,
-        strokeWidth: 1,
-        p: 3,
-      }}
-    >
-      Module Name
-    </Box>
-    {/* </svg> */}
-  </Paper>
-);
+import { useRouter } from "next/navigation";
+import { handleRoleClick, tokenStr } from "@/Auth";
 
-export default function SimpleSlide() {
-  const [checked, setChecked] = React.useState(true);
+export default function SimpleSlide({ moduleList }: any) {
+  const { push } = useRouter();
 
-  const handleChange = () => {
-    setChecked((prev) => !prev);
+  const handleClickRole = async (role: any) => {
+    push(`http://localhost:3001/home?email=${tokenStr.email}&role=${role}`);
   };
 
   return (
     <Box
       sx={{
-        height: 180,
-        width: 130,
+        // height: 180,
+        // width: 130,
         position: "relative",
         zIndex: 1,
       }}
     >
-      {/* <FormControlLabel
-        control={<Switch checked={checked} onChange={handleChange} />}
-        label="Show"
-      /> */}
-      <Box sx={{ display: "flex" }}>
-        <Slide
-          direction="right"
-          style={{ transformOrigin: "0 0 0" }}
-          {...(checked ? { timeout: 2000 } : {})}
-          in={checked}
-          mountOnEnter
-          unmountOnExit
-        >
-          <h1>Module Name</h1>
-        </Slide>
-        <Slide
-          direction="up"
-          style={{ transformOrigin: "0 0 0" }}
-          {...(checked ? { timeout: 2000 } : {})}
-          in={checked}
-          mountOnEnter
-          unmountOnExit
-        >
-          {icon}
-        </Slide>
-        <Slide
-          direction="down"
-          style={{ transformOrigin: "0 0 0" }}
-          {...(checked ? { timeout: 2000 } : {})}
-          in={checked}
-          mountOnEnter
-          unmountOnExit
-        >
-          {icon}
-        </Slide>
-        <Slide
-          direction="left"
-          style={{ transformOrigin: "0 0 0" }}
-          {...(checked ? { timeout: 2000 } : {})}
-          in={checked}
-          mountOnEnter
-          unmountOnExit
-        >
-          {icon}
-        </Slide>
-      </Box>
+      <Container fixed>
+        <Grid container spacing={2}>
+          {moduleList.map((el: any, i: any) => {
+            return (
+              <Grid item xs={4}>
+                <Slide
+                  direction={el.direction}
+                  style={{ transformOrigin: "0 0 0", height: "100%" }}
+                  {...(true ? { timeout: 1000 } : {})}
+                  in={true}
+                  mountOnEnter
+                  unmountOnExit
+                >
+                  <Card
+                    sx={{
+                      minWidth: 255,
+                      boxShadow:
+                        "0px 2px 5px 0px rgba(0,0,0,0.2), 0px 1px 1px 0px rgb(169 172 250 / 42%), 0px 1px 5px 0px rgb(120 186 246 / 61%)",
+                    }}
+                  >
+                    <CardContent>
+                      <Typography
+                        sx={{
+                          fontSize: 16,
+                          fontWeight: 600,
+                          textAlign: "center",
+                          backgroundColor: "#1976D3",
+                          borderRadius: "10px",
+                          color: "white",
+                        }}
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        {el.name}
+                      </Typography>
+                      <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        A UPSC gate pass grants access for Employees and
+                        Officers, containing Employees/Officers details for
+                        secure entry into UPSC premises.
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      {el.roles.map((el2: any) => {
+                        return (
+                          <Button
+                            size="small"
+                            onClick={async () => {
+                              handleClickRole(el2.name);
+                            }}
+                            sx={{ color: "#E1780E" }}
+                          >
+                            {el2.name}
+                          </Button>
+                        );
+                      })}
+                    </CardActions>
+                  </Card>
+                </Slide>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Container>
     </Box>
   );
 }

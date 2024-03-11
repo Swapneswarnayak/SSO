@@ -44,7 +44,7 @@ export default function ClippedDrawer({
               margin: "auto",
             }}
           >
-            UPSC SSO DASHBOARD
+            UPSC Common Dashboard
           </Typography>
         </Toolbar>
       </AppBar>

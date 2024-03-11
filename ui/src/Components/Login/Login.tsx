@@ -24,6 +24,8 @@ import { useState, FormEvent } from "react";
 import Image from "next/image";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { signin } from "@/Auth";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,6 +33,12 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [inputCaptcha, setInputCaptcha] = useState<any>("");
   const [captchaCode, SetCaptchaCode] = useState<any>("");
+  const [formData, setFormData] = useState<any>({
+    email: "",
+    password: "",
+  });
+
+  const { push } = useRouter();
 
   const refreshCapcha = () => {
     SetCaptchaCode(Math.random().toString(36).substr(2, 6));
@@ -48,6 +56,34 @@ const Login = () => {
     event.preventDefault();
   };
 
+  const handleChange = (event: any) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    if (inputCaptcha == captchaCode) {
+      try {
+        const response = await signin(formData);
+        console.log(response?.data?.data, "resp");
+        localStorage.setItem("token", JSON.stringify(response?.data?.data));
+        push("/Dashboard");
+      } catch (error: any) {
+        setError(error.response.data.message);
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+        refreshCapcha();
+      }
+    } else {
+      alert("Wrong Captcha");
+    }
+  }
+
   return (
     <Box sx={parentBox}>
       <Box sx={sideBox}>
@@ -61,9 +97,7 @@ const Login = () => {
           </Box>
           <Box>
             {error && <div style={{ color: "red" }}>{error}</div>}
-            <form
-            //   onSubmit={onSubmit}
-            >
+            <form onSubmit={onSubmit}>
               <Typography
                 variant="body1"
                 sx={{
@@ -79,6 +113,8 @@ const Login = () => {
                 placeholder="Enter Email Id"
                 size="small"
                 required={true}
+                name="email"
+                onChange={handleChange}
                 // value={email}
                 sx={{
                   width: "100%",
@@ -102,6 +138,8 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 required={true}
+                name="password"
+                onChange={handleChange}
                 size="small"
                 sx={{
                   width: "100%",
@@ -186,7 +224,7 @@ const Login = () => {
                 </Tooltip>
               </Box>
               <LoginButton
-                // onClick={loginUser}
+                // onClick={onSubmit}
                 type="submit"
                 disabled={isLoading}
                 size="small"
